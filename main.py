@@ -115,12 +115,17 @@ except Exception:
 # RAILWAY
 # ============================================================
 
-PORT = int(
-    os.environ.get(
-        "PORT",
-        "8000",
-    )
-)
+def _env_port(name: str, default: int) -> int:
+    # پلتفرم‌هایی مثل Shiprr ممکن است PORT را خالی یا غیرعددی بدهند؛
+    # کرش نکن (Rollout: Failed) و به پیش‌فرض برگرد.
+    try:
+        value = int((os.environ.get(name) or "").strip())
+        return value if 0 < value < 65536 else default
+    except ValueError:
+        return default
+
+
+PORT = _env_port("PORT", 8000)
 
 DATA_DIR = Path(
     os.environ.get(
